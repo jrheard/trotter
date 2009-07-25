@@ -1,0 +1,39 @@
+trotter.py is a little script which grabs Daytrotter sessions for you.
+
+It relies on a couple of non-built-in libraries you'll probably have to install.
+It's not too complicated a process, so bear with me - if you are a person who is
+new to the command line, I'll hold your hand; if you are a person who knows
+their way around a UNIX environment, you can do this in your sleep.
+
+1. Download and install setuptools from http://pypi.python.org/pypi/setuptools#downloads .
+        I recommend grabbing the "Source" .tar.gz file, which should be on top.
+        Unzip it. Then,
+        * If you're on a mac:
+            i. Bring up Spotlight and type in Terminal, then select the Terminal program.
+        * If you're on Windows:
+            i. Bring up the command line (hit Start, then Run, then type "cmd" and hit enter)
+        * If you're on Linux:
+            i. Bring up a friggin' terminal, you know how to do this stuff.
+            
+        Now then:
+            ii. In the Terminal, use the "cd" command to change directories so you end
+                up in the same place you unzipped the setuptools package.
+                ( http://www.computerhope.com/unix/ucd.htm might help if you have trouble. )
+            iii. Once you're finally there, type "python setup.py install" and hit enter.
+                You should see a bunch of relatively encouraging text, and it should now be installed.
+                
+2. Download and install feedparser from http://code.google.com/p/feedparser/downloads/list
+    Unzip it, follow the same directions as above to get to the folder and run "python setup.py install".
+    
+3. Download and install python-dateutil from
+    http://labix.org/python-dateutil#head-2f49784d6b27bae60cde1cff6a535663cf87497b .
+    Unzip it, follow the same directions from 1) to get to the folder and run "python setup.py install".
+    
+4. Okay! Now you're all set and ready to grab sessions. Bring up a command line, navigate to the place where
+    you put the trotter.py script (you'll probably want it to be somewhere relatively permanent, like
+    C:\trotter or ~/trotter), and run "python trotter.py --help". That should walk you through the rest.
+    
+5. Enjoy sweet, sweet music.
+    
+    
+Brought to you by JR Heard (jrheard@cs.stanford.edu). 
