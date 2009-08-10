@@ -2,13 +2,13 @@
 
 """Daytrotter-trotter.
 
-Trots on over to daytrotter.com and grabs the latest Daytrotter Session .mp3s.
+Trots on over to the music blogs of your choice and grabs their delicious .mp3s.
 By default, remembers the last session you downloaded and only gets newer ones;
 also accepts specific date-ranges and downloads all sessions in that range.
 Songs are saved in the songs/ subdirectory, which will be created in the same
 directory that trotter.py lives in.
 
-Note: The trotter uses daytrotter.com's RSS feed to do its magic, and that feed
+Note: The trotter uses daytrotter.com's RSS feed (among others) to do its magic, and that feed
 	seems to only list the most recent ~29 sessions at any given time, so
 	you're basically SOL if you fall more than 29 sessions behind.
 	It won't crash or anything, but if you specify a date range that contains
@@ -40,9 +40,15 @@ __license__ = "Python"
 
 
 from sgmllib import SGMLParser
-import feedparser, urllib
-import datetime, dateutil.parser
-import re, os, sys, getopt
+import csv
+import datetime
+import dateutil.parser
+import feedparser
+import getopt
+import os
+import re
+import sys
+import urllib
 
 class DaytrotterParser(SGMLParser):
 	"""A simple parser class, used to find <a> tags in Daytrotter Sessions pages
@@ -72,7 +78,7 @@ class DaytrotterParser(SGMLParser):
 def grab_songs_from_session(session):
 	"""Downloads the songs from the session it's handed"""
 	
-	print "grabbing", session.title, "..."
+	print "grabbing", session.title, "-", session.updated, "..."
 	sock = urllib.urlopen(session.link)
 	html = sock.read()
 	sock.close()
@@ -91,32 +97,27 @@ def grab_songs_from_session(session):
 
 def parseDate(date):
 	"""Takes a date string, parses it, returns a datetime.date"""
-	
 	return dateutil.parser.parse(date).date()
 
 
 def session_in_daterange(session, start, end):
 	"""Returns true if the session is between the start and end dates, inclusive; false otherwise"""
-	
 	updated = parseDate(session.updated)
 	return start <= updated and end >= updated
 
 
-def should_update_logfile(sessions):
+def should_update_logfile(start, sessions):
 	"""Returns true if the logfile should be updated to reflect this trot, false otherwise"""
-	
-	try:
-		last_updated = parseDate(file("log.txt").read())
-		return last_updated < parseDate(sessions[0].updated)
-	except:
-		return True # the logfile didn't exist, so we should create one
+	return start < parseDate(sessions[0].updated)
 
-def grab_sessions(start, end):
+def grab_sessions(url, start, end):
 	"""Grabs all sessions between the start and end dates, inclusive"""
-	
-	print "grabbing all sessions between", start, "and", end, "..."
-	
-	feed = feedparser.parse('http://www.daytrotter.com/rss/recentlyadded.aspx')
+
+	if not start:
+		start = datetime.date.today() + datetime.timedelta(days=-365)
+
+	print "grabbing all updates between", start, "and", end, "..."
+	feed = feedparser.parse(url)
 	
 	try:
 		os.mkdir("songs")
@@ -132,20 +133,20 @@ def grab_sessions(start, end):
 	print "done!"
 	os.chdir("..") # back out so's we don't keep the logfile in the same dir as the songs
 	
-	if(sessions and should_update_logfile(sessions)):
-		logfile = open("log.txt", "w")
-		logfile.write(sessions[0].updated) # log the most recent downloaded session for next time
-		logfile.close()
-		print "\nmarked your place at", sessions[0].updated, "for next time."
-
+	if(sessions and should_update_logfile(start, sessions)):
+		return sessions[0].updated
 
 def usage():
 	print __doc__
  
 	
 def main(argv):
+	urls = ('http://feeds.feedburner.com/AnAquariumDrunkard', 'http://www.fluxblog.org/feed', 'http://www.daytrotter.com/rss/recentlyadded.aspx')
 	start = None
 	end = datetime.date.today()
+	start_dates = {}
+	for url in urls:
+		start_dates[url] = start
 	
 	try:
 		opts, args = getopt.getopt(argv, "hs:e:", ["help", "start=", "end="])
@@ -160,15 +161,37 @@ def main(argv):
 			start = parseDate(arg[1:])
 		elif opt in ("-e", "--end"):
 			end = parseDate(arg[1:])
+
+	try:
+		# use more accurate start dates, if we've logged any
+		reader = csv.reader(open("log.csv"))
+		for row in reader:
+			url = row[0]
+			start = parseDate(row[1])
+			start += datetime.timedelta(days=1) # skip ahead a little, no need to re-download this session
+			start_dates[url] = start
+	except:
+		# we've got sensible defaults, so we're good to go
+		pass
+
+
+	# okay, go get 'em
+	for url in start_dates:
+		start_date = start_dates[url]
+		date_to_log = grab_sessions(url, start, end)
+		if(date_to_log):
+			start_dates[url] = date_to_log
 	
-	if not start: # if start wasn't set, set it
-		try:
-			start = parseDate(file("log.txt").read()) # grab the start date from the log file
-			start += datetime.timedelta(days=1) # skip ahead one day, no need to re-download this session
-		except: 
-			start = datetime.date.today() + datetime.timedelta(days=-365) # grab whatever we can
-	
-	grab_sessions(start, end) # okay, go get 'em
+	# log the latest start dates we've seen
+	logfile = open("log.csv", "w")
+	writer = csv.writer(logfile)
+	for url in start_dates:
+		date = start_dates[url]
+		if date:
+			writer.writerow([url, date])
+		print "\nmarked your place for", url, "at", date, "for next time."
+
+	logfile.close()
 
 if __name__ == "__main__":
 	main(sys.argv[1:])

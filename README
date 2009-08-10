@@ -1,4 +1,5 @@
 trotter.py is a little script which grabs Daytrotter sessions for you.
+(it now also grabs mp3s from any music blog RSS feed you've hard-coded into it)
 
 It relies on a couple of non-built-in libraries you'll probably have to install.
 It's not too complicated a process, so bear with me - if you are a person who is
@@ -11,7 +12,7 @@ their way around a UNIX environment, you can do this in your sleep.
         * If you're on a mac:
             i. Bring up Spotlight and type in Terminal, then select the Terminal program.
         * If you're on Windows:
-            i. Bring up the command line (hit Start, then Run, then type "cmd" and hit enter)
+            i. Bring up the command line (hit Start, then Run, then type "cmd" and hit enter) (by the way if you don't have python installed you should probably take care of that)
         * If you're on Linux:
             i. Bring up a friggin' terminal, you know how to do this stuff.
             
@@ -35,5 +36,5 @@ their way around a UNIX environment, you can do this in your sleep.
     
 5. Enjoy sweet, sweet music.
     
-    
-Brought to you by JR Heard (jrheard@cs.stanford.edu). 
+
+TODO: separate the hard-coded list of URLs out into a separate file, allow for addition/removal of feeds to parse via command-line options
