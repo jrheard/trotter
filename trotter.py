@@ -168,7 +168,7 @@ def main(argv):
 		for row in reader:
 			url = row[0]
 			start = parseDate(row[1])
-			start += datetime.timedelta(days=1) # skip ahead a little, no need to re-download this session
+			start += datetime.timedelta(minutes=1) # skip ahead a little, no need to re-download this session
 			start_dates[url] = start
 	except:
 		# we've got sensible defaults, so we're good to go
