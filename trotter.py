@@ -142,7 +142,10 @@ def usage():
  
 	
 def main(argv):
-	urls = ('http://feeds.feedburner.com/AnAquariumDrunkard', 'http://www.fluxblog.org/feed', 'http://www.daytrotter.com/rss/recentlyadded.aspx')
+	urls = ('http://feeds.feedburner.com/AnAquariumDrunkard',
+		'http://www.fluxblog.org/feed',
+		'http://www.daytrotter.com/rss/recentlyadded.aspx',
+		'http://www.themixtape.co.uk/feeds/posts/default')
 	start = None
 	end = datetime.date.today()
 	start_dates = {}
