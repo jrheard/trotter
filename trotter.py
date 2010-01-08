@@ -90,7 +90,8 @@ def grab_songs_from_session(session):
 	urls = parser.get_song_urls()
 	
 	for url in urls:
-		filename = url.split("/")[-1]
+		encoded_filename = url.split("/")[-1]
+		filename = urllib.unquote(encoded_filename)
 		print "\tgrabbing", filename
 		urllib.urlretrieve(url, filename)
 
